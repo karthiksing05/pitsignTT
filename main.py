@@ -4,8 +4,6 @@ import sys
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 from PIL import Image
 
-import numpy as np
-
 import glob
 
 # image1 = Image.open("1.png")
@@ -55,8 +53,10 @@ matrix = RGBMatrix(options=options)
 newImgs = []
 
 for image in images:
-    image = np.hstack([image, transparent])
-    newImgs.append(images)
+    dst = Image.new('RGB', (image.width + transparent.width, image.height))
+    dst.paste(image, (0, 0))
+    dst.paste(transparent, (image.width, 0))
+    newImgs.append(dst)
 
 images = newImgs
 
