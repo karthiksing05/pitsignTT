@@ -19,13 +19,13 @@ def af(lst, idx):
     """factorial but you add instead of multiply"""
     val = 0
     for i, elem in enumerate(lst):
-        if i <= idx:
+        if i < idx:
             val += elem
         else:
             return val
     return val
 
-filenames = [fn for fn in glob.iglob("pics/*.png")]
+filenames = sorted([fn for fn in glob.iglob("pics/*.png")])
 images = [Image.open(fn) for fn in filenames]
 
 transparent = Image.open('transparent.png')
@@ -70,9 +70,6 @@ xpos = 0
 widths = [image.size[0] for image in images]
 cycleDelay = 0.01
 
-slot = 0
-
-xpos = 0
 while True:
     try:
         xpos += 1
@@ -84,5 +81,6 @@ while True:
 
         double_buffer = matrix.SwapOnVSync(double_buffer)
         time.sleep(0.01)
+
     except KeyboardInterrupt:
         sys.exit(0)
