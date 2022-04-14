@@ -6,15 +6,7 @@ from PIL import Image
 
 import glob
 
-# image1 = Image.open("1.png")
-# image2 = Image.open("2.png")
-# image3 = Image.open("3.png")
-# image4 = Image.open("4.png")
-# image5 = Image.open("5.png")
-# image6 = Image.open("6.png")
-# image7 = Image.open("7.png")
-# image8 = Image.open("8.png")
-
+### A helper function that we will be using later on to get the positions where the logos should go
 def af(lst, idx):
     """factorial but you add instead of multiply"""
     val = 0
@@ -25,13 +17,15 @@ def af(lst, idx):
             return val
     return val
 
+### Loading the images into variables in the two lines below
 filenames = sorted([fn for fn in glob.iglob("pics/*.png")])
 images = [Image.open(fn) for fn in filenames]
 
+### Loading a transparent image (we will be using this later)
 transparent = Image.open('transparent.png')
 transparent = transparent.resize((32, 10))
 
-# Configuration for the matrix
+### Configuration of the matrix (so it is rigged for our settings/hardware)
 options = RGBMatrixOptions()
 options.rows = 32
 options.chain_length = 5
@@ -40,16 +34,7 @@ options.hardware_mapping = 'adafruit-hat'  # If you have an Adafruit HAT: 'adafr
 
 matrix = RGBMatrix(options=options)
 
-# Make image fit our screen.
-# image1.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
-# image2.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
-# image3.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
-# image4.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
-# image5.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
-# image6.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
-# image7.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
-# image8.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
-
+### The below code is adding a transparent image to the end of every picture in order to 
 newImgs = []
 
 for image in images:
@@ -60,10 +45,25 @@ for image in images:
 
 images = newImgs
 
+### Setting the image thumbnail so that when each image is displayed on the matrix screen it fits
 for image in images:
     image.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
 
-print("Press CTRL-C to stop.")
+### The code below is the mainloop to cycle all the images. The way it works is as follows:
+# 1.  A double_buffer (canvas) is created; this is what cycles through the matrix. 
+#     We are putting each image on this virtual "canvas" at specific offsets to make the
+#     pit sign look like it's scrolling.
+# 2.  The mainloop iterates forever, and only stops when [CTRL] and the C key are pressed, 
+#     this is the default keyboard break for python code and will always end it.
+# 3.  There is a variable called xpos that changes by 1 interval, and when adding the pictures
+#     to the canvas, this variable will be used to offset each addition; once the 
+# 4.  There is also the add-factorial helper method being used, this is just an easy way to
+#     offset every new image being added by the widths of the previous images so no images end
+#     up being overlapped.
+### Once again, please let me know on GitHub (open up an issue under the repository) if you have any
+### questions, comments, concerns, etc.
+
+print("Press CTRL + C to stop.")
 double_buffer = matrix.CreateFrameCanvas()
 xpos = 0
 
