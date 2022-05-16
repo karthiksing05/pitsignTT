@@ -6,24 +6,13 @@ from PIL import Image
 
 import glob
 
-### A helper function that we will be using later on to get the positions where the logos should go
-def af(lst, idx):
-    """factorial but you add instead of multiply"""
-    val = 0
-    for i, elem in enumerate(lst):
-        if i < idx:
-            val += elem
-        else:
-            return val
-    return val
-
 ### Loading the images into variables in the two lines below
-filenames = sorted([fn for fn in glob.iglob("pics/*.png")])
-images = [Image.open(fn) for fn in filenames]
+
+image = Image.open("pics\\1techno.png")
 
 ### Loading a transparent image (we will be using this later)
-transparent = Image.open('transparent.png')
-transparent = transparent.resize((32, 10))
+# transparent = Image.open('transparent.png')
+# transparent = transparent.resize((32, 10))
 
 ### Configuration of the matrix (so it is rigged for our settings/hardware)
 options = RGBMatrixOptions()
@@ -34,20 +23,8 @@ options.hardware_mapping = 'adafruit-hat'  # If you have an Adafruit HAT: 'adafr
 
 matrix = RGBMatrix(options=options)
 
-### The below code is adding a transparent image to the end of every picture in order to 
-newImgs = []
-
-for image in images:
-    dst = Image.new('RGB', (image.width + transparent.width, image.height))
-    dst.paste(image, (0, 0))
-    dst.paste(transparent, (image.width, 0))
-    newImgs.append(dst)
-
-images = newImgs
-
 ### Setting the image thumbnail so that when each image is displayed on the matrix screen it fits
-for image in images:
-    image.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
+image.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
 
 ### The code below is the mainloop to cycle all the images. The way it works is as follows:
 # 1.  A double_buffer (canvas) is created; this is what cycles through the matrix. 
@@ -67,20 +44,11 @@ print("Press CTRL + C to stop.")
 double_buffer = matrix.CreateFrameCanvas()
 xpos = 0
 
-widths = [image.size[0] for image in images]
 cycleDelay = 0.01
 
 while True:
-    try:
-        xpos += 1
-        if xpos > sum(widths):
-            xpos = 0
 
-        for i, image in enumerate(images):
-            double_buffer.SetImage(image.convert('RGB'), -xpos + af(widths, i))
+    double_buffer.SetImage(image.convert('RGB'), 160) # change that maybe?
 
-        double_buffer = matrix.SwapOnVSync(double_buffer)
-        time.sleep(cycleDelay)
-
-    except KeyboardInterrupt:
-        sys.exit(0)
+    double_buffer = matrix.SwapOnVSync(double_buffer)
+    time.sleep(cycleDelay)
